@@ -1,3 +1,4 @@
+/// <reference types="cypress" />
 const { Section2 } = require('../objects/section-2')
 
 describe('Problem 2', () => {
@@ -7,4 +8,10 @@ describe('Problem 2', () => {
    *
    * Test away!
    */
+  it('Validate API response', () => {
+      cy.get(Section2.actions.assertSampleApiResponse().then((response) => {
+
+        expect(response.body).to.have.length(10)
+      });
+  })
 })
