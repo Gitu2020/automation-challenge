@@ -3,14 +3,19 @@ const Section1 = {
    * A literal is considered static, stable strings (eg. titles, form labels, ...)
    */
   literals: {
-    SAMPLE_LITERAL: 'This is a sample literal. You can safely delete it.',
+    TABLE_BUTTON_TEXT: 'Show table',
+    DATE_OF_BIRTH_TEXT: 'D.O.B',
+    DOB_FORMAT: 'DD-MM-YYYY',
   },
 
   /**
    * An element is a selector for any DOM element (eg. [data-test="xxx"], #id, ...)
    */
   elements: {
-    sampleElement: '[data-test=sample-element-to-be-safely-deleted]',
+    tableButtonElement: '[data-test= table-toggle-button]',
+    tableElement: '[data-test = user-table]',
+    tableHeaderElement: '[data-test = table-header]',
+
   },
 
   /**
@@ -34,6 +39,57 @@ const Section1 = {
         expect(request.status).to.eq(200)
       })
     },
+    verifyTableInteractions () {
+      cy.get(Section1.elements.tableButtonElement).should('not.be.visible').contains(Section1.literals.TABLE_BUTTON_TEXT).click()
+    .then(() => {
+      cy.get(Section1.elements.tableElement).should('be.visible')
+    })
+    },
+
+    verifyTableSize () {
+      let tableCol = 5
+      let tableRow = 11
+
+      cy.get(Section1.elements.tableHeaderElement).find('th').then((th) => {
+        th.length.should('have.length', tableCol)
+      })
+
+      cy.get(Section1.elements.tableElement).find('tr').then((tr) => {
+        th.length.eq(tableRow - 1)
+      })
+    },
+
+    verifyUserRole () {
+      let count = 5
+
+      cy.get(Section1.elements.tableElement).find('tr').each(($el) => {
+        cy.wrap($el)
+      .invoke('text')
+      .then((text) => {
+        if ($el === 'user') {
+          values.push(text.trim())
+        }
+      })
+      })
+     .then(() => expect(values).should('be.gte', count))
+    },
+
+  },
+
+  verifyAge () {
+    let count
+
+    cy.get(Section1.elements.tableElement).find('th').then(($rows) => {
+      $rows.each((index, value) => {
+        const date = Cypress.$(value).find(Section1.literals.DATE_OF_BIRTH_TEXT).text()
+        const todaysDate = new Date()
+
+        if (todaysDate.subtract(60, 'days').format(DOB_FORMAT) >= date) {
+          count = count + 1
+        }
+      })
+    })
+    .then(() => expect(count).to.eq(3))
   },
 }
 
