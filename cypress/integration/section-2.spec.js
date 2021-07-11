@@ -8,10 +8,16 @@ describe('Problem 2', () => {
    *
    * Test away!
    */
-  it('Validate API response', () => {
-      cy.get(Section2.actions.assertSampleApiResponse().then((response) => {
 
-        expect(response.body).to.have.length(10)
-      });
+  it('Click on the button and validate response', () => {
+    Section2.actions.assertNetworkApiResponse()
+  })
+
+  it('Validate Browser API: Opening a new tab', () => {
+    Section2.actions.assertNetworkApiResponse()
+  })
+
+  it('Validate Browser API: Downloading a file', () => {
+    Section2.actions.downloadFile()
   })
 })
