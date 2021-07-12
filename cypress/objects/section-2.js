@@ -4,7 +4,8 @@ const Section2 = {
    */
   literals: {
     NETWORK_ALERT_MSG: 'Abnormally long network call!',
-    FILE_DOWNLOAD_IMAGE: '/assets/img/javascript-logo.png'
+    FILE_DOWNLOAD_IMAGE: '/assets/img/javascript-logo.png',
+    newtabButtonText: 'Click me!'
   },
 
   /**
@@ -13,7 +14,6 @@ const Section2 = {
   elements: {
     networkCallButton: '[data-test = network-call-button]',
     newtabButton: '[data-test = new-tab-button]',
-    newtabButtonText: 'Click me!',
     fileDownloadButton: 'data-test = file-download-button'
   },
 
@@ -41,33 +41,35 @@ const Section2 = {
   },
 
   assertNetworkApiResponse () {
-    cy.get(elements.networkCallButton.click().then((response) => {
+    cy.get(networkCallButton.click().then((response) => {
       expect(response.status).to.eq(200)
       expect(response.body).to.have.length(10)
       cy.on('window:alert', (str) => {
-        expect(str).to.equal(this.literals.NETWORK_ALERT_MSG)
+        expect(str).to.equal(NETWORK_ALERT_MSG)
+      })
     })
-  }),
+    )
+  },
 
-assertNewTabOpen () {
-  cy.get(elements.newtabButton.invoke('removeAttr','target').click().then (() =>
-      expect(cy.contains(elements.newtabButtonText)).should('not.exist')
+  assertNewTabOpen () {
+  cy.get(newtabButton.invoke('removeAttr','target').click().then (() =>
+      expect(cy.contains(newtabButtonText)).should('not.exist')
  
-  ),
+  ))
 }, 
 
 downloadFile () {
-  cy.get(this.elements.fileDownloadButton.should('be.visible').click().then ((
-    cy.wait(2000)),
-    expect(cy.contains(elements.fileDownloadButton)).should('not.exist'),
-    cy.downloadFile("FILE_DOWNLOAD_IMAGE",'./mydownloads/example.jpg')).then ( () => {
+  cy.get(fileDownloadButton.should('be.visible').click().then (() => {
+    cy.wait(2000)
+    expect(cy.contains(fileDownloadButton)).should('not.exist'),
+    cy.downloadFile(FILE_DOWNLOAD_IMAGE,'./mydownloads/example.jpg').then ( () => {
       cy.task("getImageText", {fileName: "./mydownloads/example.jpg"}
       .then(text => {
         expect(text).to.contains("")
-      })
-    ,)
-  )
-  }
-}
+      }))
+    })
+  })
+  },
+} 
 
 module.exports = { Section2 }

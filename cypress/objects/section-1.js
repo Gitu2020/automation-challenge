@@ -6,6 +6,12 @@ const Section1 = {
     TABLE_BUTTON_TEXT: 'Show table',
     DATE_OF_BIRTH_TEXT: 'D.O.B',
     DOB_FORMAT: 'DD-MM-YYYY',
+    SHOW_FORM_LABEL: 'Show Form',
+    FULL_NAME: 'test',
+    AGE: '25',
+    GENDER: 'Female',
+    PROFESSION: 'nurse',
+    ALERT_WINDOW_TEXT: 'Form submitted!',
   },
 
   /**
@@ -15,6 +21,13 @@ const Section1 = {
     tableButtonElement: '[data-test= table-toggle-button]',
     tableElement: '[data-test = user-table]',
     tableHeaderElement: '[data-test = table-header]',
+    signUpForm: '[data-test = signup-form]',
+    signupFormButton: '[data-test= form-toggle-button]',
+    formFullNameElement: '[data-test = full-name-input]',
+    formAgeElement: '[data-test = age-input]',
+    genderElement: '[data-test = gender-select]',
+    professionElement: '[data-test = nurse-input]',
+    submitFormElement: '[data-test = submit-btn]',
 
   },
 
@@ -29,20 +42,11 @@ const Section1 = {
      *
      * This is only used as an example and can be safely deleted.
      */
-    assertSampleApiResponse () {
-      cy.server()
-      cy.wait('/endpoint').as('endpoint')
 
-      cy.get(Section1.elements.sampleElement).click()
-      // ... An api call to "/endpoint" performed on the app.
-      cy.wait('@endpoint').should((request) => {
-        expect(request.status).to.eq(200)
-      })
-    },
     verifyTableInteractions () {
-      cy.get(Section1.elements.tableButtonElement).should('not.be.visible').contains(Section1.literals.TABLE_BUTTON_TEXT).click()
+      cy.get(tableButtonElement).should('not.be.visible').contains(TABLE_BUTTON_TEXT).click()
     .then(() => {
-      cy.get(Section1.elements.tableElement).should('be.visible')
+      cy.get(tableElement).should('be.visible')
     })
     },
 
@@ -50,11 +54,11 @@ const Section1 = {
       let tableCol = 5
       let tableRow = 11
 
-      cy.get(Section1.elements.tableHeaderElement).find('th').then((th) => {
+      cy.get(tableHeaderElement).find('th').then((th) => {
         th.length.should('have.length', tableCol)
       })
 
-      cy.get(Section1.elements.tableElement).find('tr').then((tr) => {
+      cy.get(tableElement).find('tr').then((tr) => {
         th.length.eq(tableRow - 1)
       })
     },
@@ -62,7 +66,7 @@ const Section1 = {
     verifyUserRole () {
       let count = 5
 
-      cy.get(Section1.elements.tableElement).find('tr').each(($el) => {
+      cy.get(tableElement).find('tr').each(($el) => {
         cy.wrap($el)
       .invoke('text')
       .then((text) => {
@@ -79,9 +83,9 @@ const Section1 = {
   verifyAge () {
     let count
 
-    cy.get(Section1.elements.tableElement).find('th').then(($rows) => {
+    cy.get(tableElement).find('th').then(($rows) => {
       $rows.each((index, value) => {
-        const date = Cypress.$(value).find(Section1.literals.DATE_OF_BIRTH_TEXT).text()
+        const date = Cypress.$(value).find(DATE_OF_BIRTH_TEXT).text()
         const todaysDate = new Date()
 
         if (todaysDate.subtract(60, 'days').format(DOB_FORMAT) >= date) {
@@ -91,6 +95,35 @@ const Section1 = {
     })
     .then(() => expect(count).to.eq(3))
   },
+
+  validateSignUpForm () {
+    cy.get(signUpForm).should('not.be.visible')
+    cy.get(signupFormButton).click().then(() => {
+      cy.contains(SHOW_FORM_LABEL).should('be.visible')
+    })
+  },
+
+  validateFormFields () {
+    cy.get(formFullNameElement).should('be.visible').type(FULL_NAME).should('have. value', FULL_NAME)
+    cy.get(formAgeElement).should('be.visible').type(AGE).should('have.value', AGE)
+  },
+
+  selectDropDownOption () {
+    cy.get(genderElement).select(GENDER).should('have.value', GENDER)
+  },
+
+  checkProfession () {
+    cy.get(professionElement).check(PROFESSION).should('have.value', PROFESSION)
+  },
+
+  submirForm () {
+    cy.get(submitFormElement).click().then(() => {
+      cy.on('window:alert', (str) => {
+        expect(str).to.equal(ALERT_WINDOW_TEXT)
+      })
+    })
+  },
+
 }
 
 module.exports = { Section1 }
