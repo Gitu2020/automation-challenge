@@ -41,35 +41,35 @@ const Section2 = {
   },
 
   assertNetworkApiResponse () {
-    cy.get(networkCallButton.click().then((response) => {
+    cy.get(this.networkCallButton.click().then((response) => {
       expect(response.status).to.eq(200)
       expect(response.body).to.have.length(10)
       cy.on('window:alert', (str) => {
-        expect(str).to.equal(NETWORK_ALERT_MSG)
+        expect(str).to.equal(this.NETWORK_ALERT_MSG)
       })
     })
     )
   },
 
   assertNewTabOpen () {
-  cy.get(newtabButton.invoke('removeAttr','target').click().then (() =>
-      expect(cy.contains(newtabButtonText)).should('not.exist')
+  cy.get(this.newtabButton.invoke('removeAttr','target').click().then (() =>
+      expect(cy.contains(this.newtabButtonText)).should('not.exist')
  
   ))
 }, 
 
 downloadFile () {
-  cy.get(fileDownloadButton.should('be.visible').click().then (() => {
+  cy.get(this.fileDownloadButton.should('be.visible').click().then (() => {
     cy.wait(2000)
-    expect(cy.contains(fileDownloadButton)).should('not.exist'),
-    cy.downloadFile(FILE_DOWNLOAD_IMAGE,'./mydownloads/example.jpg').then ( () => {
+    expect(cy.contains(this.fileDownloadButton)).should('not.exist'),
+    cy.downloadFile(this.FILE_DOWNLOAD_IMAGE,'./mydownloads/example.jpg').then ( () => {
       cy.task("getImageText", {fileName: "./mydownloads/example.jpg"}
       .then(text => {
         expect(text).to.contains("")
       }))
     })
-  })
-  },
-} 
+  }), 
+}
+}
 
 module.exports = { Section2 }

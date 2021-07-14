@@ -44,21 +44,24 @@ const Section1 = {
      */
 
     verifyTableInteractions () {
-      cy.get(tableButtonElement).should('not.be.visible').contains(TABLE_BUTTON_TEXT).click()
-    .then(() => {
-      cy.get(tableElement).should('be.visible')
-    })
+      cy.visit('http://localhost:8080', { responseTimeout: 31000 })
+      cy.get(this.tableButtonElement).should('not.be.visible')
+      cy.contains(this.TABLE_BUTTON_TEXT).then(($btn) => {
+        if ($btn.click()) {
+          cy.get(this.tableElement).should('be.visible')
+        }
+      })
     },
 
     verifyTableSize () {
       let tableCol = 5
       let tableRow = 11
 
-      cy.get(tableHeaderElement).find('th').then((th) => {
+      cy.get(this.tableHeaderElement).find('th').then((th) => {
         th.length.should('have.length', tableCol)
       })
 
-      cy.get(tableElement).find('tr').then((tr) => {
+      cy.get(this.tableElement).find('tr').then((tr) => {
         th.length.eq(tableRow - 1)
       })
     },
@@ -66,7 +69,7 @@ const Section1 = {
     verifyUserRole () {
       let count = 5
 
-      cy.get(tableElement).find('tr').each(($el) => {
+      cy.get(this.tableElement).find('tr').each(($el) => {
         cy.wrap($el)
       .invoke('text')
       .then((text) => {
@@ -83,12 +86,12 @@ const Section1 = {
   verifyAge () {
     let count
 
-    cy.get(tableElement).find('th').then(($rows) => {
+    cy.get(this.tableElement).find('th').then(($rows) => {
       $rows.each((index, value) => {
-        const date = Cypress.$(value).find(DATE_OF_BIRTH_TEXT).text()
+        const date = Cypress.$(value).find(this.DATE_OF_BIRTH_TEXT).text()
         const todaysDate = new Date()
 
-        if (todaysDate.subtract(60, 'days').format(DOB_FORMAT) >= date) {
+        if (todaysDate.subtract(60, 'days').format(this.DOB_FORMAT) >= date) {
           count = count + 1
         }
       })
@@ -97,27 +100,27 @@ const Section1 = {
   },
 
   validateSignUpForm () {
-    cy.get(signUpForm).should('not.be.visible')
-    cy.get(signupFormButton).click().then(() => {
-      cy.contains(SHOW_FORM_LABEL).should('be.visible')
+    cy.get(this.signUpForm).should('not.be.visible')
+    cy.get(this.signupFormButton).click().then(() => {
+      cy.contains(this.SHOW_FORM_LABEL).should('be.visible')
     })
   },
 
   validateFormFields () {
-    cy.get(formFullNameElement).should('be.visible').type(FULL_NAME).should('have. value', FULL_NAME)
-    cy.get(formAgeElement).should('be.visible').type(AGE).should('have.value', AGE)
+    cy.get(this.formFullNameElement).should('be.visible').type(this.FULL_NAME).should('have. value', this.FULL_NAME)
+    cy.get(this.formAgeElement).should('be.visible').type(this.AGE).should('have.value', this.AGE)
   },
 
   selectDropDownOption () {
-    cy.get(genderElement).select(GENDER).should('have.value', GENDER)
+    cy.get(this.genderElement).select(this.GENDER).should('have.value', this.GENDER)
   },
 
   checkProfession () {
-    cy.get(professionElement).check(PROFESSION).should('have.value', PROFESSION)
+    cy.get(this.professionElement).check(this.PROFESSION).should('have.value', this.PROFESSION)
   },
 
-  submirForm () {
-    cy.get(submitFormElement).click().then(() => {
+  submitForm () {
+    cy.get(this.submitFormElement).click().then(() => {
       cy.on('window:alert', (str) => {
         expect(str).to.equal(ALERT_WINDOW_TEXT)
       })
