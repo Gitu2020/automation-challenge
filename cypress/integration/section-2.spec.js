@@ -10,14 +10,14 @@ describe('Problem 2', () => {
    */
 
   it('Click on the button and validate response', () => {
-    Section2.actions.assertNetworkApiResponse()
+    cy.invoke(Section2.actions.assertNetworkApiResponse())
   })
 
   it('Validate Browser API: Opening a new tab', () => {
-    Section2.actions.assertNetworkApiResponse()
+    cy.invoke(Section2.actions.assertNetworkApiResponse())
   })
 
   it('Validate Browser API: Downloading a file', () => {
-    Section2.actions.downloadFile()
+    cy.invoke(Section2.actions.downloadFile())
   })
 })
