@@ -10,6 +10,7 @@ const Section1 = {
     FULL_NAME: 'test',
     AGE: '25',
     GENDER: 'Female',
+    GENDER_VALUE: 'female',
     PROFESSION: 'nurse',
     ALERT_WINDOW_TEXT: 'Form submitted!',
   },
@@ -19,15 +20,20 @@ const Section1 = {
    */
   elements: {
     tableButtonElement: '[data-test= table-toggle-button]',
-    tableElement: '[data-test = user-table]',
-    tableHeaderElement: '[data-test = table-header]',
+    tableElement: '[data-test="user-table"]',
+    tableHeaderElement: '[data-test = "table-header"]',
     signUpForm: '[data-test = signup-form]',
     signupFormButton: '[data-test= form-toggle-button]',
+    signUpFormId: '#alaya-form',
     formFullNameElement: '[data-test = full-name-input]',
+    formFullName: 'input[name="fullName"]',
     formAgeElement: '[data-test = age-input]',
+    formAge: 'input[name="age"]',
     genderElement: '[data-test = gender-select]',
     professionElement: '[data-test = nurse-input]',
+    professionCheckBox: '[type="checkbox"]',
     submitFormElement: '[data-test = submit-btn]',
+    href: '/section-1',
 
   },
 
@@ -45,88 +51,87 @@ const Section1 = {
 
     verifyTableInteractions () {
       cy.visit('http://localhost:8080', { responseTimeout: 31000 })
-      cy.get(this.tableButtonElement).should('not.be.visible')
-      cy.contains(this.TABLE_BUTTON_TEXT).then(($btn) => {
+      cy.get('a').eq(2).click()
+      cy.get('a[href= "/section-1"]').click().then(() => {
+        cy.get(Section1.elements.tableElement).should('not.be.visible')
+      })
+
+      cy.contains(Section1.literals.TABLE_BUTTON_TEXT).then(($btn) => {
         if ($btn.click()) {
-          cy.get(this.tableElement).should('be.visible')
+          cy.get(Section1.elements.tableButtonElement).should('be.visible').click()
         }
       })
     },
 
     verifyTableSize () {
       let tableCol = 5
-      let tableRow = 11
+      let tableRow = 10
 
-      cy.get(this.tableHeaderElement).find('th').then((th) => {
-        th.length.should('have.length', tableCol)
-      })
+      cy.get(Section1.elements.tableHeaderElement).find('th').should('have.length', tableCol)
 
-      cy.get(this.tableElement).find('tr').then((tr) => {
-        th.length.eq(tableRow - 1)
-      })
+      cy.get(Section1.elements.tableElement).find('tr').should('have.length', tableRow + 1)
     },
 
     verifyUserRole () {
-      let count = 5
+      const count = 5
 
-      cy.get(this.tableElement).find('tr').each(($el) => {
-        cy.wrap($el)
-      .invoke('text')
-      .then((text) => {
-        if ($el === 'user') {
-          values.push(text.trim())
+      cy.get(Section1.elements.tableElement).get('tr').each(($elem) => {
+        if ($elem.text === 'user') {
+          $elem = $elem + 1
+          expect($elem).to.be.gte(count)
         }
       })
-      })
-     .then(() => expect(values).should('be.gte', count))
     },
 
-  },
+    verifyAge () {
+      cy.get('th:nth-child(4)').each(($e1, index, $list) => {
+        const today = new Date()
+        let count = 0
 
-  verifyAge () {
-    let count
+        if ($e1.text === 'D.O.B') {
+          cy.get('th:nth-child(4)').next()
+            .eq(index)
+            .then(function (Field) {
+              const Fieldtext = Field.text()
+              const dateString = Cypress.moment(Fieldtext, 'MM/DD/YYYY')
+              const year = Cypress.moment(dateString, 'MM/DD/YYYY').format('YYYY')
+              let ageDifMs = today.getFullYear - year
 
-    cy.get(this.tableElement).find('th').then(($rows) => {
-      $rows.each((index, value) => {
-        const date = Cypress.$(value).find(this.DATE_OF_BIRTH_TEXT).text()
-        const todaysDate = new Date()
+              if (ageDifMs > 60) {
+                count = count + 1
+              }
 
-        if (todaysDate.subtract(60, 'days').format(this.DOB_FORMAT) >= date) {
-          count = count + 1
+              expect(count = 3)
+            })
         }
       })
-    })
-    .then(() => expect(count).to.eq(3))
-  },
+    },
 
-  validateSignUpForm () {
-    cy.get(this.signUpForm).should('not.be.visible')
-    cy.get(this.signupFormButton).click().then(() => {
-      cy.contains(this.SHOW_FORM_LABEL).should('be.visible')
-    })
-  },
-
-  validateFormFields () {
-    cy.get(this.formFullNameElement).should('be.visible').type(this.FULL_NAME).should('have. value', this.FULL_NAME)
-    cy.get(this.formAgeElement).should('be.visible').type(this.AGE).should('have.value', this.AGE)
-  },
-
-  selectDropDownOption () {
-    cy.get(this.genderElement).select(this.GENDER).should('have.value', this.GENDER)
-  },
-
-  checkProfession () {
-    cy.get(this.professionElement).check(this.PROFESSION).should('have.value', this.PROFESSION)
-  },
-
-  submitForm () {
-    cy.get(this.submitFormElement).click().then(() => {
-      cy.on('window:alert', (str) => {
-        expect(str).to.equal(ALERT_WINDOW_TEXT)
+    validateSignUpForm () {
+      cy.get(Section1.elements.signUpForm).should('not.be.visible')
+      cy.get(Section1.elements.signupFormButton).click().then(() => {
+        cy.contains(Section1.literals.SHOW_FORM_LABEL).should('be.visible')
       })
-    })
-  },
+    },
 
+    validateFormFields () {
+      cy.get(Section1.elements.signUpFormId).within(() => {
+        cy.get(Section1.elements.formFullName).should('be.visible').type(Section1.literals.FULL_NAME).should('have.value', Section1.literals.FULL_NAME)
+        cy.get(Section1.elements.formAge).should('be.visible').type(Section1.literals.AGE).should('have.value', Section1.literals.AGE)
+
+        cy.get(Section1.elements.genderElement).select(Section1.literals.GENDER).should('have.value', Section1.literals.GENDER_VALUE)
+        cy.get(Section1.elements.professionCheckBox).check().should('be.checked')
+      })
+    },
+
+    submitForm () {
+      cy.get(Section1.elements.submitFormElement).click().then(() => {
+        cy.on('window:alert', (str) => {
+          expect(str).to.equal(Section1.literals.ALERT_WINDOW_TEXT)
+        })
+      })
+    },
+  },
 }
 
 module.exports = { Section1 }
